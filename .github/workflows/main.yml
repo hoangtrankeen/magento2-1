@@ -6,9 +6,9 @@ name: CI Magento Site
 # events but only for the master branch
 on:
   push:
-    branches: master
+    branches: 2.4-develop
   pull_request:
-    branches: master
+    branches: 2.4-develop
 
 jobs:
   magento2-build:
