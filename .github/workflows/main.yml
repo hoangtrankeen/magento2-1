@@ -1,0 +1,80 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI Magento Site
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: 2.3
+  pull_request:
+    branches: 2.3
+
+jobs:
+  magento2-build:
+    runs-on: ubuntu-18.04
+    name: 'm2 tests & build'
+    services:
+      mysql:
+        image: docker://mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: magento
+          MYSQL_DATABASE: magento
+        ports:
+          - 3106:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+ 
+    - name: 'phpcs testing'
+      if: ${{false}}
+      uses: MAD-I-T/magento-actions@master
+      env:
+        COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
+      with:
+        php: '7.2'
+        process: 'phpcs-test'
+        extension: 'Magento/CatalogSearch'
+        standard: 'Magento2'
+    - name: 'launch magento2 build'
+      if: always()
+      uses: MAD-I-T/magento-actions@master
+      env:
+        COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
+      with:
+        php: '7.2'
+        process: 'build'
+    - name: 'launch magento2 zero downtime deploy'
+      if: success()
+      uses: MAD-I-T/magento-actions@master
+      env:
+        COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
+        BUCKET_COMMIT: bucket-commit-${{github.sha}}.tar.gz
+        MYSQL_ROOT_PASSWORD: magento
+        MYSQL_DATABASE: magento
+        HOST_DEPLOY_PATH: ${{secrets.STAGE_HOST_DEPLOY_PATH}}
+        HOST_DEPLOY_PATH_BUCKET: ${{secrets.STAGE_HOST_DEPLOY_PATH}}/bucket
+        SSH_PRIVATE_KEY: ${{secrets.STAGE_SSH_PRIVATE_KEY}}
+        SSH_CONFIG: ${{secrets.STAGE_SSH_CONFIG}}
+        WRITE_USE_SUDO: false
+      with:
+        php: '7.2'
+        process: 'deploy-staging'
+    - name: 'unlock deployer if fails'
+      if: failure() || cancelled()
+      uses: MAD-I-T/magento-actions@master
+      env:
+        COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
+        BUCKET_COMMIT: bucket-commit-${{github.sha}}.tar.gz
+        MYSQL_ROOT_PASSWORD: magento
+        MYSQL_DATABASE: magento
+        HOST_DEPLOY_PATH: ${{secrets.STAGE_HOST_DEPLOY_PATH}}
+        HOST_DEPLOY_PATH_BUCKET: ${{secrets.STAGE_HOST_DEPLOY_PATH}}/bucket
+        SSH_PRIVATE_KEY: ${{secrets.STAGE_SSH_PRIVATE_KEY}}
+        SSH_CONFIG: ${{secrets.STAGE_SSH_CONFIG}}
+        WRITE_USE_SUDO: false
+      with:
+        php: '7.2'
+        process: 'cleanup-staging'
