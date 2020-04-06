@@ -12,7 +12,7 @@ on:
 
 jobs:
   magento2-build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     name: 'm2 tests & build'
     services:
       mysql:
