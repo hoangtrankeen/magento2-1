@@ -34,7 +34,7 @@ jobs:
       env:
         COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
       with:
-        php: '7.1'
+        php: '7.2'
         process: 'build'
 
     - name: 'launch magento2 zero downtime deploy'
@@ -51,7 +51,7 @@ jobs:
         SSH_CONFIG: ${{secrets.STAGE_SSH_CONFIG}}
         WRITE_USE_SUDO: false
       with:
-        php: '7.1'
+        php: '7.2'
         process: 'deploy-staging'
 
     - name: 'unlock deployer if fails'
@@ -68,6 +68,6 @@ jobs:
         SSH_CONFIG: ${{secrets.STAGE_SSH_CONFIG}}
         WRITE_USE_SUDO: false
       with:
-        php: '7.1'
+        php: '7.2'
         process: 'cleanup-staging'
    
