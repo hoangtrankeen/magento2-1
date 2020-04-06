@@ -30,7 +30,7 @@ jobs:
 
     - name: 'launch magento2 build'
       if: always()
-      uses: hoangtrankeen/magento-actions@master
+      uses: MAD-I-T/magento-actions@master
       env:
         COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
       with:
@@ -39,7 +39,7 @@ jobs:
 
     - name: 'launch magento2 zero downtime deploy'
       if: success()
-      uses: hoangtrankeen/magento-actions@master
+      uses: MAD-I-T/magento-actions@master
       env:
         COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
         BUCKET_COMMIT: bucket-commit-${{github.sha}}.tar.gz
@@ -56,7 +56,7 @@ jobs:
 
     - name: 'unlock deployer if fails'
       if: failure() || cancelled()
-      uses: hoangtrankeen/magento-actions@master
+      uses: MAD-I-T/magento-actions@master
       env:
         COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
         BUCKET_COMMIT: bucket-commit-${{github.sha}}.tar.gz
@@ -70,3 +70,4 @@ jobs:
       with:
         php: '7.1'
         process: 'cleanup-staging'
+   
